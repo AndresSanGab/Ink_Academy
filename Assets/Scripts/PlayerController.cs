@@ -6,35 +6,48 @@ public class PlayerController : MonoBehaviour
     public GameObject bulletPrefab;
     public Transform firePoint;
 
-    private Rigidbody rb; // Cambiamos a Rigidbody en lugar de Rigidbody2D
+    private Rigidbody rb;
     private Vector3 moveInput;
 
     void Start()
     {
-        rb = GetComponent<Rigidbody>(); // Usamos Rigidbody en lugar de Rigidbody2D
+        rb = GetComponent<Rigidbody>();
     }
 
     void Update()
     {
-        // Movimiento
-        moveInput.x = Input.GetAxis("Horizontal"); // Movimiento en el eje X
-        moveInput.z = Input.GetAxis("Vertical");   // Movimiento en el eje Z
-        moveInput.y = 0; // Aseguramos que no haya movimiento en el eje Y
+    moveInput.x = Input.GetAxis("Horizontal"); 
+    moveInput.z = Input.GetAxis("Vertical"); 
+    moveInput.y = 0; 
 
-        // Disparo
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            Shoot();
-        }
+    // Girar el sprite y el FirePoint
+    if (moveInput.x > 0)
+    {
+        transform.localScale = new Vector3(1, 1, 1); // Mirando a la derecha
+        firePoint.localRotation = Quaternion.Euler(0, 0, 0); // Apunta a la derecha
     }
+    else if (moveInput.x < 0)
+    {
+        transform.localScale = new Vector3(-1, 1, 1); // Mirando a la izquierda
+        firePoint.localRotation = Quaternion.Euler(0, 180, 0); // Apunta a la izquierda
+    }
+
+    if (Input.GetKeyDown(KeyCode.Space))
+    {
+        Shoot();
+    }
+    }
+
+
 
     void FixedUpdate()
     {
-        rb.linearVelocity = moveInput * moveSpeed; // Aplicamos movimiento al Rigidbody
+        rb.linearVelocity = moveInput * moveSpeed; // Aplicamos movimiento en 3D
     }
 
     void Shoot()
     {
-        Instantiate(bulletPrefab, firePoint.position, Quaternion.identity);
+    Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
     }
+
 }

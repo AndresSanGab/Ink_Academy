@@ -7,7 +7,7 @@ public class Enemy : MonoBehaviour
     public GameObject keyPrefab;
     public float moveSpeed = 2f;
     
-    private Vector2 moveDirection;
+    private Vector3 moveDirection;
     private bool keyDropped = false;
 
     void Start()
@@ -23,7 +23,8 @@ public class Enemy : MonoBehaviour
 
     void ChangeDirection()
     {
-        moveDirection = new Vector2(Random.Range(-1f, 1f), Random.Range(-1f, 1f)).normalized;
+        // Movimiento aleatorio en X y Z (no en Y)
+        moveDirection = new Vector3(Random.Range(-1f, 1f), 0, Random.Range(-1f, 1f)).normalized;
     }
 
     public void TakeDamage()
