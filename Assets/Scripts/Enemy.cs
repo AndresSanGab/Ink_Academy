@@ -23,13 +23,14 @@ public class Enemy : MonoBehaviour
 
     void ChangeDirection()
     {
-        // Movimiento aleatorio en X y Z (no en Y)
         moveDirection = new Vector3(Random.Range(-1f, 1f), 0, Random.Range(-1f, 1f)).normalized;
     }
 
     public void TakeDamage()
     {
         health--;
+        Debug.Log("Enemigo recibió daño, vida restante: " + health);
+
         if (health <= 0)
         {
             DropItem();
