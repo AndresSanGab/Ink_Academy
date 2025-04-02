@@ -2,59 +2,101 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    public float moveSpeed = 5f;
-    public GameObject bulletPrefab;
-    public Transform firePoint;
+    public float moveSpeed = 5f; // Velocidad de movimiento
+    private Rigidbody rb; // Referencia al Rigidbody
+    private Vector3 moveDirection; // Dirección del movimiento
+    public int maxHealth = 3; // Vida máxima
+    public GameObject[] hearts; // Corazones para mostrar en la UI
+    public GameObject gameOverCanvas; // Pantalla de Game Over
+    public bool isGameOver = false; // Estado de Game Over
 
-    private Rigidbody rb;
-    private Vector3 moveInput;
+    // Hacer la propiedad 'currentHealth' pública solo para lectura
+    public int currentHealth { get; private set; } // No es posible modificarla directamente desde fuera
 
     void Start()
     {
-        rb = GetComponent<Rigidbody>();
+        rb = GetComponent<Rigidbody>(); // Obtener el Rigidbody del jugador
+        currentHealth = maxHealth; // Inicializa la vida del jugador
+        UpdateHealthUI(); // Actualiza la UI de los corazones
+        gameOverCanvas.SetActive(false); // Asegura que la pantalla de Game Over esté oculta al inicio
     }
 
     void Update()
     {
-    moveInput.x = Input.GetAxis("Horizontal"); 
-    moveInput.z = Input.GetAxis("Vertical"); 
-    moveInput.y = 0; 
+        if (isGameOver) return; // Si el juego ha terminado, no mueve al jugador
 
-    // Movimiento
-    if (moveInput.x > 0) // Si se mueve a la derecha
-    {
-        transform.rotation = Quaternion.Euler(0, 180, 0); // Mantiene la rotación original
+        // Obtén las entradas del teclado
+        float moveX = Input.GetAxisRaw("Horizontal"); // Movimiento horizontal
+        float moveZ = Input.GetAxisRaw("Vertical"); // Movimiento en el eje Z (adelante y atrás)
+        moveDirection = new Vector3(moveX, 0f, moveZ).normalized; // Calcula la dirección de movimiento
     }
-    else if (moveInput.x < 0) // Si se mueve a la izquierda
-    {
-        transform.rotation = Quaternion.Euler(0, 0, 0); // Rota 180° en Y para mirar a la izquierda
-    }
-
-    if (Input.GetKeyDown(KeyCode.Space))
-    {
-        Shoot();
-    }
-    }
-
 
     void FixedUpdate()
     {
-        rb.linearVelocity = moveInput * moveSpeed; // Aplicamos movimiento en 3D
+        if (isGameOver) return; // Si el juego ha terminado, no mueve al jugador
+
+        // Mueve al jugador utilizando el Rigidbody
+        rb.linearVelocity = new Vector3(moveDirection.x * moveSpeed, rb.linearVelocity.y, moveDirection.z * moveSpeed);
     }
 
-    void Shoot()
+    public void TakeDamage(int damage)
     {
-    GameObject bullet = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
-    Rigidbody rb = bullet.GetComponent<Rigidbody>();
+        if (isGameOver) return; // No hace nada si el juego ha terminado
 
-    if (rb != null)
-    {
-        Vector3 shootDirection = new Vector3(transform.localScale.x > 0 ? 1 : -1, 0, 0); // Dispara en función de la escala en X
-        rb.linearVelocity = shootDirection * 10f; // Aplica velocidad con Rigidbody normal
+        currentHealth -= damage; // Reducir vida por el daño
+
+        if (currentHealth <= 0)
+        {
+            currentHealth = 0;
+            GameOver(); // Llama al Game Over cuando el jugador se queda sin vida
+        }
+
+        UpdateHealthUI(); // Actualiza la UI
     }
-    else
+
+    public void Heal()
     {
-        Debug.LogError("La bala instanciada no tiene un Rigidbody.");
+        if (isGameOver) return; // No permite curarse si el juego terminó
+
+        if (currentHealth < maxHealth)
+        {
+            currentHealth++; // Aumenta la vida
+            UpdateHealthUI(); // Actualiza la UI
+        }
     }
+
+    void UpdateHealthUI()
+    {
+        for (int i = 0; i < hearts.Length; i++)
+        {
+            if (i < currentHealth)
+            {
+                hearts[i].SetActive(true); // Activa el corazón si tiene vida
+            }
+            else
+            {
+                hearts[i].SetActive(false); // Desactiva el corazón si no tiene vida
+            }
+        }
+    }
+
+    void GameOver()
+    {
+        isGameOver = true; // Marca el estado de Game Over
+        gameOverCanvas.SetActive(true); // Muestra la pantalla de Game Over
+        Time.timeScale = 0; // Detiene el tiempo en el juego (opcional)
+    }
+
+    public void RestartGame()
+    {
+        // Aquí puedes reiniciar el juego
+        Time.timeScale = 1; // Reactiva el tiempo
+        isGameOver = false;
+        currentHealth = maxHealth;
+        UpdateHealthUI();
+        gameOverCanvas.SetActive(false);
+
+        // Opcionalmente, también puedes reiniciar la posición del jugador
+        transform.position = Vector3.zero; // O cualquier otra posición inicial
     }
 }

@@ -6,7 +6,7 @@ public class Enemy : MonoBehaviour
     public GameObject coinPrefab;
     public GameObject keyPrefab;
     public float moveSpeed = 2f;
-    
+
     private Vector3 moveDirection;
     private bool keyDropped = false;
 
@@ -18,12 +18,21 @@ public class Enemy : MonoBehaviour
 
     void Update()
     {
-        transform.Translate(moveDirection * moveSpeed * Time.deltaTime);
+        // Aquí no deberíamos mover al enemigo, ya que lo queremos fijo por ahora
+        // transform.Translate(moveDirection * moveSpeed * Time.deltaTime);
     }
 
     void ChangeDirection()
     {
         moveDirection = new Vector3(Random.Range(-1f, 1f), 0, Random.Range(-1f, 1f)).normalized;
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            other.GetComponent<PlayerController>().TakeDamage(1); // Resta vida al jugador
+        }
     }
 
     public void TakeDamage()

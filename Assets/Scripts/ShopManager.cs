@@ -5,13 +5,15 @@ using TMPro;
 public class ShopManager : MonoBehaviour
 {
     public GameObject shopPanel; // Referencia al panel de la tienda
-    public int playerCoins = 10; // Monedas del jugador
     public int potionCost = 2;  // Precio de la poción
     public TextMeshProUGUI coinText; // Texto para mostrar monedas
 
     void Start()
     {
-        shopPanel.SetActive(false); // Asegurar que la tienda esté oculta al inicio
+        shopPanel.SetActive(false);
+        coinText.enableWordWrapping = false; // Evita saltos de línea
+        coinText.overflowMode = TextOverflowModes.Overflow; // Permite que el texto continúe sin cortar
+        coinText.rectTransform.localPosition = new Vector3(200, 10, 0);
         UpdateCoinUI();
     }
 
@@ -30,9 +32,9 @@ public class ShopManager : MonoBehaviour
 
     void BuyPotion()
     {
-    if (playerCoins >= potionCost)
+    if (PlayerInventory.coinCount >= potionCost)
     {
-        playerCoins -= potionCost;
+        PlayerInventory.coinCount -= potionCost;
         UpdateCoinUI();
 
         // Simulamos agregar al inventario (por ahora solo mostramos un mensaje)
@@ -46,7 +48,7 @@ public class ShopManager : MonoBehaviour
 
     void UpdateCoinUI()
     {
-        coinText.text = "Monedas: " + playerCoins;
-        coinText.rectTransform.anchoredPosition = new Vector2(200, 10); // Ajusta estos valores a tu gusto
+        coinText.text = "Monedas: " + PlayerInventory.coinCount;
+        coinText.rectTransform.localPosition = new Vector3(200, 10, 0);
     }
 }
