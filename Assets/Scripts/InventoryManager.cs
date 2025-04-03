@@ -6,6 +6,7 @@ public class InventoryManager : MonoBehaviour
 {
     public TextMeshProUGUI potionCountText; // Texto para mostrar cantidad de pociones
     public TextMeshProUGUI coinText; // Texto para mostrar cantidad de monedas
+    public TextMeshProUGUI keyText; // Texto para mostrar la llave en el inventario
     public GameObject inventoryPanel; // Panel del inventario
     public Button usePotionButton; // Botón para usar poción
     public PlayerController player; // Referencia al jugador
@@ -34,7 +35,8 @@ public class InventoryManager : MonoBehaviour
     public void UpdateInventoryUI()
     {
         potionCountText.text = "Pociones: " + PlayerInventory.potionCount;
-        coinText.text = "Monedas: " + PlayerInventory.coinCount;
+        coinText.text = "Monedas: " + player.coins; // Actualiza las monedas del jugador
+        keyText.text = "Llave: " + (player.HasKey() ? "1" : "0"); // Muestra la llave si el jugador la tiene
 
         // Desactiva el botón si no hay pociones o si el jugador ya tiene vida máxima
         usePotionButton.interactable = PlayerInventory.potionCount > 0 && player.currentHealth < player.maxHealth;

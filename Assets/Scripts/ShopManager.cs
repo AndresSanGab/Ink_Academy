@@ -1,12 +1,12 @@
 using UnityEngine;
-using UnityEngine.UI;
 using TMPro;
 
 public class ShopManager : MonoBehaviour
 {
     public GameObject shopPanel; // Referencia al panel de la tienda
-    public int potionCost = 2;  // Precio de la poción
+    public int potionCost = 1;  // Precio de la poción
     public TextMeshProUGUI coinText; // Texto para mostrar monedas
+    public PlayerController player; // Referencia al PlayerController para acceder a las monedas
 
     void Start()
     {
@@ -32,23 +32,22 @@ public class ShopManager : MonoBehaviour
 
     void BuyPotion()
     {
-    if (PlayerInventory.coinCount >= potionCost)
-    {
-        PlayerInventory.coinCount -= potionCost;
-        UpdateCoinUI();
+        if (player.coins >= potionCost)  // Usamos player.coins en lugar de PlayerInventory.coinCount
+        {
+            player.coins -= potionCost;  // Actualiza las monedas del jugador
+            UpdateCoinUI();
 
-        // Simulamos agregar al inventario (por ahora solo mostramos un mensaje)
-        Debug.Log("Poción comprada. Se añadirá al inventario cuando lo implementemos.");
-        
-        // Aquí guardamos la compra para usarla en el inventario después
-        PlayerInventory.potionCount++;
+            // Simulamos agregar al inventario
+            Debug.Log("Poción comprada. Se añadirá al inventario cuando lo implementemos.");
+
+            // Aquí guardamos la compra para usarla en el inventario después
+            PlayerInventory.potionCount++;
+        }
     }
-    }
 
-
-    void UpdateCoinUI()
+    public void UpdateCoinUI()
     {
-        coinText.text = "Monedas: " + PlayerInventory.coinCount;
+        coinText.text = "Monedas: " + player.coins;  // Usa player.coins en lugar de PlayerInventory.coinCount
         coinText.rectTransform.localPosition = new Vector3(200, 10, 0);
     }
 }

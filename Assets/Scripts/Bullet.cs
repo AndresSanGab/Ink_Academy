@@ -2,47 +2,24 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
-    public float speed = 10f;
-    public float lifeTime = 3f;
-    private Rigidbody rb;
+    public int damage = 1;
 
-    void Start()
+    void OnTriggerEnter(Collider other)
     {
-    rb = GetComponent<Rigidbody>();
-
-    if (rb != null)
-    {
-        Vector3 shootDirection = Vector3.zero;
-        if (Input.GetKey(KeyCode.W)) // Arriba
-            shootDirection = new Vector3(0, 1, 0);
-        else if (Input.GetKey(KeyCode.S)) // Abajo
-            shootDirection = new Vector3(0, -1, 0);
-        else // Izquierda o derecha
-            shootDirection = new Vector3(transform.localScale.x > 0 ? 1 : -1, 0, 0);
-
-        rb.AddForce(shootDirection * speed, ForceMode.VelocityChange); // Aplicar fuerza en la dirección deseada
-
-    }
-    else
-    {
-        Debug.LogError("No se encontró Rigidbody en la bala. Asegúrate de que el prefab lo tenga.");
-    }
-
-    Destroy(gameObject, lifeTime);
-    }
-
-
-    void OnTriggerEnter(Collider collision)
-    {
-    if (collision.CompareTag("Enemy"))
-    {
-        Enemy enemy = collision.GetComponent<Enemy>();
-        if (enemy != null)
+        // Verifica si el objeto con el que colisiona tiene el tag "Enemy"
+        if (other.CompareTag("Enemy"))
         {
-            enemy.TakeDamage();
+            // Llama al método TakeDamage del enemigo y pasa el daño
+            other.GetComponent<Enemy>().TakeDamage(1); // Aplica el daño al enemigo
+            Destroy(gameObject); // Destruye la bala después del impacto
         }
-        Destroy(gameObject); // Destruye la bala después de causar daño
-    }
-    }
 
+        // Si colisiona con el jugador, no hacer nada, ya que no debe impactar con él
+        // (Este código es opcional, por si deseas realizar alguna acción si la bala toca al jugador)
+        else if (other.CompareTag("Player"))
+        {
+            // No hacer nada si toca al jugador
+            Debug.Log("La bala tocó al jugador pero no debe causar daño");
+        }
+    }
 }

@@ -9,6 +9,7 @@ public class Enemy : MonoBehaviour
 
     private Vector3 moveDirection;
     private bool keyDropped = false;
+    private static bool firstEnemyDead = false; // Variable estática para rastrear si el primer enemigo muere
 
     void Start()
     {
@@ -18,8 +19,7 @@ public class Enemy : MonoBehaviour
 
     void Update()
     {
-        // Aquí no deberíamos mover al enemigo, ya que lo queremos fijo por ahora
-        // transform.Translate(moveDirection * moveSpeed * Time.deltaTime);
+        // No necesitamos mover al enemigo ahora
     }
 
     void ChangeDirection()
@@ -35,28 +35,39 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    public void TakeDamage()
+    public void TakeDamage(int damage)
     {
-        health--;
+        health -= damage;
         Debug.Log("Enemigo recibió daño, vida restante: " + health);
 
         if (health <= 0)
         {
             DropItem();
-            Destroy(gameObject);
+            Destroy(gameObject); // El enemigo muere
         }
     }
 
     void DropItem()
     {
-        if (!keyDropped && Random.value < 0.2f) // 20% de probabilidad de soltar llave
+        if (!firstEnemyDead)  // Si es el primer enemigo que muere
         {
-            Instantiate(keyPrefab, transform.position, Quaternion.identity);
-            keyDropped = true;
+            // Separa un poco la posición de la llave y la moneda
+            Vector3 dropOffset = new Vector3(0.5f, 0, 0); // Ajusta esta cantidad para mayor o menor separación
+
+            // Instanciamos la llave y la moneda con una pequeña separación
+            Instantiate(keyPrefab, transform.position + dropOffset, Quaternion.identity);
+            Instantiate(coinPrefab, transform.position - dropOffset, Quaternion.identity);
+            
+            firstEnemyDead = true; // Ya no será el primer enemigo
         }
         else
         {
-            Instantiate(coinPrefab, transform.position, Quaternion.identity);
+            // Si el jugador tiene llave, solo suelta moneda
+            if (!FindObjectOfType<PlayerController>().hasKey) 
+            {
+                Instantiate(coinPrefab, transform.position, Quaternion.identity);
+            }
         }
     }
+
 }
