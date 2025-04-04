@@ -26,10 +26,12 @@ public class PlayerController : MonoBehaviour
 
     private bool isFacingRight = true; // Dirección inicial
     public ShopManager shopManager;
+    private Animator animator;
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        animator = GetComponent<Animator>();
         currentHealth = maxHealth;
         UpdateHealthUI();
         gameOverCanvas.SetActive(false);
@@ -39,11 +41,20 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        if (isGameOver) return;
-
+        // Obtén la entrada de movimiento
         float moveX = Input.GetAxisRaw("Horizontal");
         float moveZ = Input.GetAxisRaw("Vertical");
         moveDirection = new Vector3(moveX, 0f, moveZ).normalized;
+
+        // Si el jugador se mueve, cambia el parámetro isWalking a true
+        if (moveDirection != Vector3.zero)
+        {
+            animator.SetBool("isWalking", true);  // Cambia el parámetro a true
+        }
+        else
+        {
+            animator.SetBool("isWalking", false);  // Cambia el parámetro a false
+        }
 
         // Cambiar dirección del sprite si el jugador cambia de lado
         if (moveX > 0 && !isFacingRight)
@@ -51,12 +62,19 @@ public class PlayerController : MonoBehaviour
         else if (moveX < 0 && isFacingRight)
             Flip();
 
+        // Movimiento del jugador
+        if (!isGameOver)
+        {
+            rb.linearVelocity = new Vector3(moveDirection.x * moveSpeed, rb.linearVelocity.y, moveDirection.z * moveSpeed);
+        }
+
         // Disparar solo cuando el jugador está quieto
         if (Input.GetKeyDown(KeyCode.Space) && moveDirection == Vector3.zero)
         {
             Shoot();
         }
     }
+
 
     void FixedUpdate()
     {
@@ -145,7 +163,7 @@ public class PlayerController : MonoBehaviour
         currentHealth = maxHealth;
         UpdateHealthUI();
         gameOverCanvas.SetActive(false);
-        transform.position = Vector3.zero;
+        transform.position = new Vector3(0, 2.78f, 0);
     }
 
     public void AddCoins(int amount)
