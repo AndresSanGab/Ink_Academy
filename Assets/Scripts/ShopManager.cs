@@ -48,6 +48,6 @@ public class ShopManager : MonoBehaviour
     public void UpdateCoinUI()
     {
         coinText.text = "Monedas: " + player.coins;  // Usa player.coins en lugar de PlayerInventory.coinCount
-        coinText.rectTransform.localPosition = new Vector3(200, 10, 0);
+        coinText.rectTransform.localPosition = new Vector3(100, 10, 0);
     }
 }

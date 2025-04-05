@@ -4,7 +4,7 @@ using TMPro;
 
 public class PlayerController : MonoBehaviour
 {
-    public float moveSpeed = 5f;
+    public float moveSpeed = 18f;
     private Rigidbody rb;
     private Vector3 moveDirection;
     public int maxHealth = 3;
