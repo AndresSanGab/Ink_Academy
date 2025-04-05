@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.UI; // Necesario para UI
 using TMPro;
+using UnityEngine.SceneManagement;
+
 
 public class PlayerController : MonoBehaviour
 {
@@ -192,4 +194,11 @@ public class PlayerController : MonoBehaviour
     {
         return hasKey; // Retorna si el jugador tiene la llave
     }
+
+    public void ReturnToMainMenu()
+    {
+        Time.timeScale = 1; // Volver al tiempo normal por si el juego estaba pausado
+        SceneManager.LoadScene("MainMenu");
+    }
+
 }
