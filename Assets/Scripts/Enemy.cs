@@ -5,30 +5,37 @@ public class Enemy : MonoBehaviour
     public int health = 2;
     public GameObject coinPrefab;
     public GameObject keyPrefab;
-    public float moveSpeed = 2f;
+    public float moveSpeed = 10f;
 
     private Vector3 moveDirection;
     private bool keyDropped = false;
-    private static bool firstEnemyDead = false; // Variable estática para rastrear si el primer enemigo muere
 
     void Start()
     {
-        ChangeDirection();
-        InvokeRepeating(nameof(ChangeDirection), 2f, 2f);
+        ChangeDirection();  // Asignar una dirección inicial aleatoria
+        InvokeRepeating(nameof(ChangeDirection), 2f, 2f);  // Cambiar la dirección cada 2 segundos
     }
 
     void Update()
     {
-        // No necesitamos mover al enemigo ahora
+        // Mover al enemigo constantemente en la dirección asignada
+        transform.Translate(moveDirection * moveSpeed * Time.deltaTime);
     }
 
     void ChangeDirection()
     {
+        // Cambiar la dirección de forma aleatoria
         moveDirection = new Vector3(Random.Range(-1f, 1f), 0, Random.Range(-1f, 1f)).normalized;
     }
 
     void OnTriggerEnter(Collider other)
     {
+        // Si el enemigo toca algo que no sea el jugador, cambia de dirección
+        if (!other.CompareTag("Player"))
+        {
+            ChangeDirection();  // Cambiar la dirección si toca una pared u objeto
+        }
+
         if (other.CompareTag("Player"))
         {
             other.GetComponent<PlayerController>().TakeDamage(1); // Resta vida al jugador
@@ -49,25 +56,21 @@ public class Enemy : MonoBehaviour
 
     void DropItem()
     {
-        if (!firstEnemyDead)  // Si es el primer enemigo que muere
-        {
-            // Separa un poco la posición de la llave y la moneda
-            Vector3 dropOffset = new Vector3(0.5f, 0, 0); // Ajusta esta cantidad para mayor o menor separación
+        PlayerController player = FindObjectOfType<PlayerController>();
 
-            // Instanciamos la llave y la moneda con una pequeña separación
-            Instantiate(keyPrefab, transform.position + dropOffset, Quaternion.identity);
-            Instantiate(coinPrefab, transform.position - dropOffset, Quaternion.identity);
-            
-            firstEnemyDead = true; // Ya no será el primer enemigo
+        if (!player.hasKey)
+        {
+            // Si el jugador no tiene la llave, soltar moneda y llave separadas
+            Vector3 coinDropPos = transform.position + new Vector3(-1.5f, 0, 0); // Moneda a la izquierda
+            Vector3 keyDropPos = transform.position + new Vector3(1.5f, 0, 0);   // Llave a la derecha
+
+            Instantiate(coinPrefab, coinDropPos, Quaternion.identity);
+            Instantiate(keyPrefab, keyDropPos, Quaternion.identity);
         }
         else
         {
-            // Si el jugador tiene llave, solo suelta moneda
-            if (!FindObjectOfType<PlayerController>().hasKey) 
-            {
-                Instantiate(coinPrefab, transform.position, Quaternion.identity);
-            }
+            // Si ya tiene la llave, solo soltar la moneda justo en el centro
+            Instantiate(coinPrefab, transform.position, Quaternion.identity);
         }
     }
-
 }

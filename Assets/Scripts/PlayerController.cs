@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI; // Necesario para UI
 using TMPro;
 using UnityEngine.SceneManagement;
+using System.Collections;
 
 
 public class PlayerController : MonoBehaviour
@@ -30,6 +31,10 @@ public class PlayerController : MonoBehaviour
     public ShopManager shopManager;
     private Animator animator;
 
+    private bool isInvulnerable = false;
+    private Renderer playerRenderer; // Para controlar el material y hacerlo parpadear
+
+
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -39,6 +44,8 @@ public class PlayerController : MonoBehaviour
         gameOverCanvas.SetActive(false);
         coinsText.text = "Monedas: " + coins; // Mostrar las monedas al inicio
         keyText.text = "Llave: " + (hasKey ? "1" : "0"); // Mostrar la llave en el inventario
+        playerRenderer = GetComponentInChildren<Renderer>();
+
     }
 
     void Update()
@@ -120,7 +127,7 @@ public class PlayerController : MonoBehaviour
 
     public void TakeDamage(int damage)
     {
-        if (isGameOver) return;
+        if (isGameOver || isInvulnerable) return;
 
         currentHealth -= damage;
         if (currentHealth <= 0)
@@ -130,7 +137,9 @@ public class PlayerController : MonoBehaviour
         }
 
         UpdateHealthUI();
+        StartCoroutine(DamageFlash()); // Empieza a parpadear
     }
+
 
     public void Heal()
     {
@@ -199,6 +208,21 @@ public class PlayerController : MonoBehaviour
     {
         Time.timeScale = 1; // Volver al tiempo normal por si el juego estaba pausado
         SceneManager.LoadScene("MainMenu");
+    }
+
+    private IEnumerator DamageFlash()
+    {
+        isInvulnerable = true;
+
+        for (int i = 0; i < 3; i++) // 3 parpadeos
+        {
+            playerRenderer.enabled = false;
+            yield return new WaitForSeconds(0.2f);
+            playerRenderer.enabled = true;
+            yield return new WaitForSeconds(0.2f);
+        }
+
+        isInvulnerable = false;
     }
 
 }
